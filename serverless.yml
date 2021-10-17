@@ -1,0 +1,88 @@
+service: apiCars
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: ${opt:stage, 'dev'}
+  region: eu-central-1
+#  environment:
+#   MY_VAR: <value>
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan 
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: arn:aws:dynamodb:eu-central-1:025388574077:table/Cars
+  endpointType: REGIONAL
+  apiName: apiCars-${self:provider.stage}
+  apiKeys:
+    - apiKeyCars-${self:provider.stage}
+  usagePlan:
+    quota:
+      limit: 1000
+      offset: 0
+      period: DAY
+    throttle:
+      burstLimit: 200
+      rateLimit: 100
+functions:
+  list:
+    handler: list.handler
+    events:
+      - http:
+          path: cars
+          method: get
+          private: true
+          cors: true
+  get:
+    handler: get.handler
+    events:
+      - http:
+          path: cars/{id}
+          method: get
+          private: true
+          cors: true
+  create:
+    handler: create.handler
+    events:
+      - http:
+          path: cars
+          method: put
+          private: true
+          cors: true
+  edit:
+    handler: edit.handler
+    events:
+      - http:
+          path: cars/{id}
+          method: post
+          private: true
+          cors: true
+  delete:
+    handler: delete.handler
+    events:
+      - http:
+          path: cars
+          method: delete
+          private: true
+          cors: true
+resources:
+  Resources:
+    #documentación: https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+    Cars:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Cars
+        AttributeDefinitions:
+          - AttributeName: licenseplate
+            AttributeType: S
+        KeySchema:
+          - AttributeName: licenseplate
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
