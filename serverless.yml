@@ -5,8 +5,9 @@ provider:
   runtime: python3.8
   stage: ${opt:stage, 'dev'}
   region: eu-central-1
-#  environment:
-#   MY_VAR: <value>
+  environment:
+    CLIENT_ID:
+      Ref: MyCognitoPoolClient
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -38,6 +39,9 @@ functions:
           method: get
           private: true
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref MyAuthorizer
   get:
     handler: get.handler
     events:
@@ -46,6 +50,9 @@ functions:
           method: get
           private: true
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref MyAuthorizer
   create:
     handler: create.handler
     events:
@@ -54,6 +61,9 @@ functions:
           method: put
           private: true
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref MyAuthorizer
   edit:
     handler: edit.handler
     events:
@@ -62,6 +72,9 @@ functions:
           method: post
           private: true
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref MyAuthorizer
   delete:
     handler: delete.handler
     events:
@@ -70,6 +83,16 @@ functions:
           method: delete
           private: true
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref MyAuthorizer
+  login:
+    handler: login.handler
+    events:
+      - http:
+          path: login
+          method: post
+          private: true
 resources:
   Resources:
     #documentación: https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
@@ -86,3 +109,53 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+          
+    MyCognitoPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: MyCognitoPool-${self:provider.stage}
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+            RequireUppercase: true
+            TemporaryPasswordValidityDays: 15
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
+        EmailVerificationMessage: 'Tu código de verificación para MyCarsApp es {####}'
+        EmailVerificationSubject: 'Tu código para MyCarsApp'
+        MfaConfiguration: OFF
+        UserPoolTags:
+          Env: ${self:provider.stage}
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: false
+          InviteMessageTemplate:
+            EmailMessage: 'Esta es tu contraseña para tu cuenta {username} en MyCarsApp: {####}'
+            EmailSubject: 'Tu cuenta para MyCarsApp'
+        UsernameConfiguration:
+          CaseSensitive: false
+          
+    MyCognitoPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: MyCognitoPoolClient-${self:provider.stage}
+        ExplicitAuthFlows:
+          - USER_PASSWORD_AUTH
+        RefreshTokenValidity: 30
+        UserPoolId:
+          Ref: MyCognitoPool
+    
+    MyAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: MyAuthorizer-${self:provider.stage}
+        RestApiId:
+          Ref: ApiGatewayRestApi
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - !GetAtt MyCognitoPool.Arn
+      IdentitySource: method.request.header.Authorization
