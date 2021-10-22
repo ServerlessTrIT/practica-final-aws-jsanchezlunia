@@ -93,6 +93,20 @@ functions:
           path: login
           method: post
           private: true
+  signup:
+    handler: signup.handler
+    events:
+      - http:
+          path: signup
+          method: post
+          private: true
+  confirmsignup:
+    handler: confirmsignup.handler
+    events:
+      - http:
+          path: confirmsignup
+          method: post
+          private: true
 resources:
   Resources:
     #documentación: https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
