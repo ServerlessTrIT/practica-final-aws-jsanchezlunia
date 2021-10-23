@@ -22,7 +22,7 @@ def handler(event, context):
     
     response = {
     	'statusCode': result['ResponseMetadata']['HTTPStatusCode'],
-	'body': json.dumps(body)
+	'body': json.dumps(item)
     }  
         
     return response

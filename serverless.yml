@@ -109,7 +109,6 @@ functions:
           private: true
 resources:
   Resources:
-    #documentación: https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
     Cars:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -169,7 +168,7 @@ resources:
         Name: MyAuthorizer-${self:provider.stage}
         RestApiId:
           Ref: ApiGatewayRestApi
-      Type: COGNITO_USER_POOLS
-      ProviderARNs:
-        - !GetAtt MyCognitoPool.Arn
-      IdentitySource: method.request.header.Authorization
+        Type: COGNITO_USER_POOLS
+        ProviderARNs:
+          - !GetAtt MyCognitoPool.Arn
+        IdentitySource: method.request.header.Authorization
