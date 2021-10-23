@@ -20,6 +20,10 @@ def handler(event, context):
     
     response = {
     	'statusCode': result['ResponseMetadata']['HTTPStatusCode'],
+    	'headers': {
+    	    'Access-Control-Allow-Origin': '*',
+    	    'Access-Control-Allow-Methods': 'OPTIONS, POST'
+    	},
 	'body': json.dumps(body)
     }  
         

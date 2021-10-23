@@ -25,5 +25,9 @@ def handler(event, context):
             }
     return {
         'statusCode': code,
+    	'headers': {
+    	    'Access-Control-Allow-Origin': '*',
+    	    'Access-Control-Allow-Methods': 'OPTIONS, POST'
+    	},
         'body': json.dumps(body)
     }

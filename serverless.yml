@@ -93,6 +93,7 @@ functions:
           path: login
           method: post
           private: true
+          cors: true
   signup:
     handler: auth/signup.handler
     events:
@@ -100,6 +101,7 @@ functions:
           path: signup
           method: post
           private: true
+          cors: true
   confirmsignup:
     handler: auth/confirmsignup.handler
     events:
@@ -107,6 +109,7 @@ functions:
           path: confirmsignup
           method: post
           private: true
+          cors: true
 resources:
   - ${file(resources/dynamodb_serverless.yml)}
   - ${file(resources/cognito_serverless.yml)}
