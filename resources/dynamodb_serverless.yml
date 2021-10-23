@@ -1,0 +1,14 @@
+Resources:
+  Cars:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Cars
+      AttributeDefinitions:
+        - AttributeName: licenseplate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: licenseplate
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
