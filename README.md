@@ -29,4 +29,4 @@ Crear distribución de CloudFront:
 
 aws cloudfront create-distribution --origin-domain-name bucketjsanchez.s3.amazonaws.com --default-root-object index.html
 
-* Campo DomainName devuelto al como respuesta: https://d35pae3md6s6dl.cloudfront.net
+* Campo DomainName devuelto como respuesta al crear la distribución CloudFront: https://d35pae3md6s6dl.cloudfront.net
