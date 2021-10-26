@@ -281,7 +281,7 @@ function renderApp() {
   } else if (window.location.pathname === '/editcar') {
     content = editCarPage();
   } else if (window.location.pathname === '/') {
-    content = '<h1>¡Bienvenidos!</h1>';
+    content = '<h1>¡Bienvenid@s!</h1>';
   } else if(window.location.pathname === '/login'){
     content = loginPage();
   }else if(window.location.pathname === '/signup'){
