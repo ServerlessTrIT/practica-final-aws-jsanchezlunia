@@ -1,4 +1,7 @@
 var cars = [];
+var editCarLicensePlate = null;
+var editCarBrand = null;
+var editCarModel = null;
 
 /***********************************
                API
@@ -110,6 +113,30 @@ function getCars(){
   return false;
 }
 
+function getCar(licenseplate){
+  console.log("getCar " + licenseplate);
+  //event.preventDefault();
+  
+  $.ajax({
+    url: API_CARS + '/' + licenseplate,
+    method: "GET",
+    headers:{
+      "x-api-key": API_KEY,
+      "Authorization":"Bearer "+localStorage.getItem('token')
+    }
+  }).done(function(resp){
+    editCarBrand=resp.item['brand'];
+    editCarModel=resp.item['model'];
+    goTo("/editcar");
+  }).fail(function(error){
+    //console.log(JSON.stringify(error));
+    localStorage.removeItem('token');
+    goTo("/");
+  });
+  
+  return false;
+}
+
 function putCar(){
   console.log("putCar");
   event.preventDefault();
@@ -123,6 +150,32 @@ function putCar(){
     },
     data: JSON.stringify({
       "licenseplate":$("input[id='licenseplate']").val(),
+      "brand":$("input[id='brand']").val(),
+      "model":$("input[id='model']").val()
+    })
+  }).done(function(resp){
+    getCars(); //actualizar listado de coches
+  }).fail(function(error){
+    //console.log(JSON.stringify(error));
+    localStorage.removeItem('token');
+    goTo("/");
+  });
+  
+  return false;
+}
+
+function updateCar(){
+  console.log("updateCar");
+  event.preventDefault();
+  
+  $.ajax({
+    url: API_CARS + '/' + editCarLicensePlate,
+    method: "POST",
+    headers:{
+      "x-api-key": API_KEY,
+      "Authorization":"Bearer "+localStorage.getItem('token')
+    },
+    data: JSON.stringify({
       "brand":$("input[id='brand']").val(),
       "model":$("input[id='model']").val()
     })
@@ -179,17 +232,23 @@ function confirmSignupPage(){
   return content;
 }
 
-function  newCarPage(){
+function newCarPage(){
   content='<h1>Nuevo coche</h1><br/>';
   content+='<form id="formCar"><input type="text" name="licenseplate" placeholder="Matrícula" id="licenseplate"><input type="text" name="brand" id="brand" placeholder="Marca"><input type="text" name="model" id="model" placeholder="Modelo"><button type="submit" value="Enviar" id="btnNewCar">Enviar</button></form>';
   return content;
 }
 
+function editCarPage(){
+  content='<h1>Editar coche</h1><br/>';
+  content+='<form id="formCar"><input type="text" name="licenseplate" placeholder="Matrícula" id="licenseplate" value="'+editCarLicensePlate+'" disabled="disabled"><input type="text" name="brand" id="brand" placeholder="Marca" value="'+editCarBrand+'"><input type="text" name="model" id="model" placeholder="Modelo" value="'+editCarModel+'"><button type="submit" value="Enviar" id="btnEditCar">Enviar</button></form>';
+  return content;
+}
+
 function carsPage(){
   content='<h1>Coches</h1><br/><button id="linkNewCar">Nuevo coche</button><br/>';
-  content+='<table border="1"><tr><th>Matrícula</th><th>Marca</th><th>Modelo</th><th>Eliminar</th></tr>';
+  content+='<table border="1"><tr><th>Matrícula</th><th>Marca</th><th>Modelo</th><th>Acciones</th></tr>';
   for (i = 0; i< cars.length; i++){
-    content+='<tr><td>'+cars[i].licenseplate+'</td><td>'+cars[i].brand+'</td><td>'+cars[i].model+'</td><td><button id="licenseplate_'+cars[i].licenseplate+'">X</button></td></tr>';
+    content+='<tr><td>'+cars[i].licenseplate+'</td><td class="brand">'+cars[i].brand+'</td><td class="model">'+cars[i].model+'</td><td><button id="edit_licenseplate_'+cars[i].licenseplate+'">Modificar</button><button id="licenseplate_'+cars[i].licenseplate+'">X Eliminar</button></td></tr>';
   }
   content+='</table>'
   return content;
@@ -219,6 +278,8 @@ function renderApp() {
     content = carsPage();
   } else if (window.location.pathname === '/newcar') {
     content = newCarPage();
+  } else if (window.location.pathname === '/editcar') {
+    content = editCarPage();
   } else if (window.location.pathname === '/') {
     content = '<h1>¡Bienvenidos!</h1>';
   } else if(window.location.pathname === '/login'){
@@ -258,6 +319,11 @@ function newCar(event){
   goTo('/newcar');
 }
 
+function goToEditCar(event){
+  editCarLicensePlate = $(this).attr('id').split("_")[2];
+  getCar(editCarLicensePlate);
+}
+
 
 /***********************************
           INICIALIZACIÓN
@@ -270,7 +336,9 @@ function init(){
   $("body").on("click","form button[id='btnSignup']",signup);
   $("body").on("click","form button[id='btnConfirmSignup']",confirmSignup);
   $("body").on("click","button[id^='licenseplate']",deleteCar);
+  $("body").on("click","button[id^='edit_licenseplate']",goToEditCar);
   $("body").on("click","button[id='linkNewCar']",newCar);
   $("body").on("click","form button[id='btnNewCar']",putCar);
+  $("body").on("click","form button[id='btnEditCar']",updateCar);
   renderApp();
 }
