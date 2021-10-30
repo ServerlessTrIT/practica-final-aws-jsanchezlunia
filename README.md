@@ -1,7 +1,7 @@
 # ejercicioPractico
 Ejercicio práctico evaluable
 
-Comandos CLI utilizados:
+__Comandos CLI utilizados__
 
 Crear el bucket en S3 para poder desplegar posteriormente el frontend:
 
@@ -33,7 +33,7 @@ Crear distribución de CloudFront:
 
 `aws cloudfront create-distribution --origin-domain-name bucketjsanchez.s3.amazonaws.com --default-root-object index.html`
 
-* Campo *DomainName* devuelto como respuesta al crear la distribución CloudFront: `d35pae3md6s6dl.cloudfront.net`. Es el dominio asignado por CloudFront y tiene asociado un certificado SSL. Por tanto, se puede acceder a la web desplegada en la URL `https://d35pae3md6s6dl.cloudfront.net`
+* Campo *DomainName* devuelto como respuesta al crear la distribución CloudFront: `d35pae3md6s6dl.cloudfront.net`. Es el dominio asignado por CloudFront y tiene asociado un certificado SSL. Por tanto, se puede acceder a la web desplegada en la URL <a href="https://d35pae3md6s6dl.cloudfront.net" target="_blank">__`https://d35pae3md6s6dl.cloudfront.net`__</a>
 
 
 Para desplegar el backend utilizando el framework Serverless, utilizamos el siguiente comando:
